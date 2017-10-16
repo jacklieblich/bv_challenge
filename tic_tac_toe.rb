@@ -124,7 +124,7 @@ class Board
 	end
 
 	def in_bounds?(row, col)
-		row < @spaces.size && col < @spaces[row].size
+		row >= 0 && col >= 0 && row < @spaces.size && col < @spaces[row].size
 	end
 
 	def check_winner(row, col)
