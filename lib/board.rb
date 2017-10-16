@@ -6,7 +6,6 @@ class Board
 	def initialize(size)
 		@spaces = Array.new(size) { Array.new(size) { Space.new } }
 		@winner = false
-		@moves_made = 0
 		@open_spaces = Set.new
 		populate_open_spaces(size)
 	end
@@ -22,7 +21,6 @@ class Board
 	def make_move(row, col, piece_type)
 		if @open_spaces.delete?([row, col])
 			@spaces[row][col].insert_piece(Piece.new(piece_type))
-			@moves_made += 1
 			@winner = check_winner(row, col) || check_draw
 			true
 		else
@@ -65,7 +63,7 @@ class Board
 	end
 
 	def check_draw
-		@moves_made == @spaces.size**2 ? "Draw" : false
+		@open_spaces.empty? ? "Draw" : false
 	end
 
 	def print_board
