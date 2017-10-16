@@ -1,15 +1,26 @@
 require_relative "space"
 require_relative "piece"
+require 'set'
 class Board
 	attr_reader :spaces, :winner
 	def initialize(size)
 		@spaces = Array.new(size) { Array.new(size) { Space.new } }
 		@winner = false
 		@moves_made = 0
+		@open_spaces = Set.new
+		populate_open_spaces(size)
+	end
+
+	def populate_open_spaces(size)
+		size.times do |row|
+			size.times do |col|
+				@open_spaces.add([row, col])
+			end
+		end
 	end
 
 	def make_move(row, col, piece_type)
-		if legal_move?(row, col)
+		if @open_spaces.delete?([row, col])
 			@spaces[row][col].insert_piece(Piece.new(piece_type))
 			@moves_made += 1
 			@winner = check_winner(row, col) || check_draw
@@ -20,22 +31,8 @@ class Board
 	end
 
 	def make_computer_move(piece_type)
-		@spaces.each_with_index do |row, row_index|
-			row.each_with_index do |space, col_index|
-				if space.is_empty?
-					make_move(row_index, col_index, piece_type)
-					return
-				end
-			end
-		end
-	end
-
-	def legal_move?(row, col)
-		in_bounds?(row, col) && @spaces[row][col].is_empty?
-	end
-
-	def in_bounds?(row, col)
-		row >= 0 && col >= 0 && row < @spaces.size && col < @spaces[row].size
+		location = @open_spaces.to_a.sample
+		make_move(location[0], location[1], piece_type)
 	end
 
 	def check_winner(row, col)
